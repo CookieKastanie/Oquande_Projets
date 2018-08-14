@@ -1,0 +1,19 @@
+?bg_color : lightblue
+?width : 600px
+
+body{
+  a, p{
+    color: red
+    position: relatif
+  }
+
+  :hover{
+    background-color : pink
+  }
+}
+
+@media only screen and (max-width: ?width) {
+  body {
+    background-color: ?bg_color;
+  }
+}
