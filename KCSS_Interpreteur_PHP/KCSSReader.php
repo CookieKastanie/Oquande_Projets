@@ -341,7 +341,7 @@ class KCSSReader {
   private function readKCSSText($text){
     $this->text = $this->prePoc($text);
 
-    $this->length = strlen($text);
+    $this->length = strlen($this->text);
     $this->pointer = 0;
 
     $this->currentLine = 1;
@@ -409,12 +409,12 @@ class KCSSReader {
   }
 
   public function notEOF(){
-    return $this->pointer < strlen($this->text);
+    return $this->pointer < $this->length;
   }
 
   public function readChar($offset = 0){
     $index = $this->pointer + $offset;
-    if($index >= strlen($this->text)) return 0;
+    if($index >= $this->length) return 0;
     return $this->text[$index];
   }
 
