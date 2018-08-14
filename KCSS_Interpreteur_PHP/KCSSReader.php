@@ -316,26 +316,29 @@ class KCSSReader {
   private $currentCol;
   private $vars;
   private $feuille;
+  private $path;
 
 
   function __construct() {
+    $this->resetAtts();
+  }
+
+  private function resetAtts(){
     $this->text = null;
     $this->length = 0;
     $this->pointer = 0;
     $this->currentLine = 0;
     $this->currentCol = 0;
     $this->vars = null;
+    $this->path = "KCSS Anonyme";
   }
 
-  public function readKCSS($path){
-    if(!file_exists($path)) $this->exception("Fichier '".$path."' introuvable");
+  public function readKCSS($text){
+    $this->resetAtts();
+    $this->readKCSSText($text);
+  }
 
-    ob_start();
-    require($path);
-    $text = ob_get_clean();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
+  private function readKCSSText($text){
     $this->text = $this->prePoc($text);
 
     $this->length = strlen($text);
@@ -349,10 +352,31 @@ class KCSSReader {
     $this->feuille = $this->readSequence(true);
   }
 
+  public function readKCSSFile($path){
+    $this->resetAtts();
+    $this->path = $path;
+
+    if(!file_exists($path)) $this->exception("Fichier '".$path."' introuvable");
+
+    ob_start();
+    require($path);
+    $text = ob_get_clean();
+
+    $this->readKCSSText($text);
+  }
+
   public function writeCSS(){
     if($this->feuille) return $this->feuille->toCSS();
-    return null;
+    return "";
   }
+
+  public function writeCSSFile($path){
+    $file = fopen($path, "w");
+    fwrite($file, $this->writeCSS());
+    fclose($file);
+  }
+
+////////////////////////////////////////////////////////////////////////////////
 
   public function prePoc($text){
     $finalText = "";
@@ -436,7 +460,15 @@ class KCSSReader {
   }
 
   public function exception($str){
-   throw new Exception($str."<br>ligne: ".$this->currentLine."<br>colonne: ".$this->currentCol."<br>");
+    $error = "
+    <div style=\"border: 2px solid red;border-radius:20px;padding:1em;display:inline-block;\">
+      <span>{$this->path}: {$str}</span><br>
+      <span style=\"padding-left:1em;\">- Ligne: {$this->currentLine}</span><br>
+      <span style=\"padding-left:1em;\">- Colonne: {$this->currentCol}</span><br>
+    </div>
+    ";
+
+    throw new Exception($error);
   }
 
 
