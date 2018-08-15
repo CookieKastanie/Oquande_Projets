@@ -622,7 +622,7 @@ class KCSSReader {
 
           } else {
 
-            $nomFinal += $c;
+            $nomFinal .= $c;
             $this->nextChar();
             $c = $this->readChar();
 
