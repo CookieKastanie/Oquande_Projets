@@ -378,7 +378,7 @@ class KCSSReader {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  public function prePoc($text){
+  private function prePoc($text){
     $finalText = "";
 
     $commentChar = null;
@@ -408,17 +408,17 @@ class KCSSReader {
     return $finalText;
   }
 
-  public function notEOF(){
+  private function notEOF(){
     return $this->pointer < $this->length;
   }
 
-  public function readChar($offset = 0){
+  private function readChar($offset = 0){
     $index = $this->pointer + $offset;
     if($index >= $this->length) return 0;
     return $this->text[$index];
   }
 
-  public function nextChar($n = 1){
+  private function nextChar($n = 1){
     while ($n--) {
       ++$this->currentCol;
 
@@ -431,7 +431,7 @@ class KCSSReader {
     }
   }
 
-  public function skipSpaces(){
+  private function skipSpaces(){
     $c = $this->readChar();
     while (ord($c) <= 32){
       $this->nextChar();
@@ -439,12 +439,12 @@ class KCSSReader {
     }
   }
 
-  public function isSimpleChar($c){
+  private function isSimpleChar($c){
     $v = $c ? ord($c) : $c;
     return ($v >= 97 && $v <= 122) || ($v >= 65 && $v <= 90) || ($v >= 48 && $v <= 57 || $v == 95);
   }
 
-  public function readNom($move = false){
+  private function readNom($move = false){
     $buffer = "";
     $offset = 0;
 
@@ -459,7 +459,7 @@ class KCSSReader {
     return $buffer;
   }
 
-  public function exception($str){
+  private function exception($str){
     $error = "
     <div style=\"border: 2px solid red;border-radius:20px;padding:1em;display:inline-block;\">
       <span>{$this->path}: {$str}</span><br>
@@ -475,7 +475,7 @@ class KCSSReader {
 //////////////////////////////////////////////////////////////
 
 
-  public function readSequence($root = false){
+  private function readSequence($root = false){
     $seq = new Sequence($root);
 
     $this->skipSpaces();
@@ -541,7 +541,7 @@ class KCSSReader {
 
 
 
-  public function readVar(){
+  private function readVar(){
     if($this->readChar() != '?') return false;
 
     $this->nextChar();
@@ -571,14 +571,14 @@ class KCSSReader {
     return true;
   }
 
-  public function readVarVal(){
+  private function readVarVal(){
     $nomVar = $this->readNom(true);
     if(!isset($this->vars[$nomVar])) $this->exception("La variable '".$nomVar."' n'existe pas");
     return $this->vars[$nomVar];
   }
 
 
-  public function readBlock(){
+  private function readBlock(){
     $block = new Block();
 
     $nomFinal = "";
@@ -744,7 +744,7 @@ class KCSSReader {
   }
 
 
-  public function readAttribut(){
+  private function readAttribut(){
     $att = new Attribut();
 
     $buff = $this->readNom();
