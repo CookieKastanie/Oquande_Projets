@@ -402,7 +402,8 @@ class KCSSReader {
         }
       }
 
-      if((!$commentChar && !$wait) || ord($c1) == 13) $finalText .= $c1;
+      $c1Val = ord($c1);
+      if((!$commentChar && !$wait) || ($c1Val == 13 || $c1Val == 10)) $finalText .= $c1;
     }
 
     return $finalText;
@@ -441,7 +442,7 @@ class KCSSReader {
 
   private function isSimpleChar($c){
     $v = $c ? ord($c) : $c;
-    return ($v >= 97 && $v <= 122) || ($v >= 65 && $v <= 90) || ($v >= 48 && $v <= 57 || $v == 95);
+    return ($v >= 97 && $v <= 122) || ($v >= 65 && $v <= 90) || ($v >= 48 && $v <= 57 || $v == 95 || $v == 45);
   }
 
   private function readNom($move = false){
