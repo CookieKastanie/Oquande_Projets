@@ -391,10 +391,10 @@ class KCSSReader {
       $wait = false;
 
       if(!$commentChar){
-        if($c1 == '/' && $c2 == '/') $commentChar = chr(13);
+        if($c1 == '/' && $c2 == '/') $commentChar = chr(10);
         else if ($c1 == '/' && $c2 == '*') $commentChar = '*';
       } else {
-        if(ord($commentChar) == 13 && ord($c1) == 13) $commentChar = null;
+        if(ord($commentChar) == 10 && $this->isNewLine($c1)) $commentChar = null;
         else if ($commentChar == '*' && $c1 == '*' && $c2 == '/'){
           $commentChar = null;
           $wait = true;
@@ -402,8 +402,7 @@ class KCSSReader {
         }
       }
 
-      $c1Val = ord($c1);
-      if((!$commentChar && !$wait) || ($c1Val == 13 || $c1Val == 10)) $finalText .= $c1;
+      if((!$commentChar && !$wait) || $this->isNewLine($c1)) $finalText .= $c1;
     }
 
     return $finalText;
@@ -443,6 +442,11 @@ class KCSSReader {
   private function isSimpleChar($c){
     $v = $c ? ord($c) : $c;
     return ($v >= 97 && $v <= 122) || ($v >= 65 && $v <= 90) || ($v >= 48 && $v <= 57 || $v == 95 || $v == 45);
+  }
+
+  private function isNewLine($c){
+    $code = ord($c);
+    return $code == 10 || $code == 13;
   }
 
   private function readNom($move = false){
@@ -557,7 +561,7 @@ class KCSSReader {
 
     $buffer = "";
     $c = $this->readChar();
-    while($c != ';' && ord($c) != 13){
+    while($c != ';' && !$this->isNewLine($c)){
       $buffer .= $c;
       $this->nextChar();
       $c = $this->readChar();
@@ -777,13 +781,13 @@ class KCSSReader {
 
       while ($this->readChar() === ' ') $this->nextChar();
       $c = $this->readChar();
-      if($c == ';' || ord($c) == 13 || $c == '}') $this->nextChar();
+      if($c == ';' || $this->isNewLine($c) || $c == '}') $this->nextChar();
       else $this->exception("Jeton imprévu -> '".$this->readChar()."'");
 
     } else {
       $buffer = "";
       $c = $this->readChar();
-      while ($c != ';' && ord($c) != 13 && $c != '}') {
+      while ($c != ';' && !$this->isNewLine($c) && $c != '}') {
         $buffer .= $c;
         $this->nextChar();
         $c = $this->readChar();

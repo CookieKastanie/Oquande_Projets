@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Test</title>
+    <style media="screen">
+      textarea{
+        height: 350px;
+        width: 40%;
+        display: inline-block;
+
+
+        background: url(http://i.imgur.com/2cOaJ.png);
+        background-attachment: local;
+        background-repeat: no-repeat;
+        padding-left: 35px;
+        padding-top: 10px;
+        border-color:#ccc;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="input"></textarea>
+    <button id="envoi">Compiler</button>
+    <p id="error"></p>
+    <textarea id="output"></textarea>
+
+    <script type="text/javascript">
+      const ouputZone = document.getElementById('output');
+      const errorZone = document.getElementById('error');
+
+      const envoi = () => {
+        fetch('process.php', {
+          method: 'POST',
+          body: document.getElementById('input').value
+        }).then(response => {
+          return response.text().then(text => {
+            if(response.status == 200) return text;
+            else return Promise.reject(text);
+          });
+        }).then(text => {
+          ouputZone.value = text;
+          errorZone.innerHTML = "";
+        }).catch(err => {
+          ouputZone.value = "";
+          errorZone.innerHTML = err;
+        });
+      }
+
+      document.getElementById('envoi').onclick = envoi;
+    </script>
+  </body>
+</html>
