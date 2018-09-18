@@ -508,6 +508,8 @@ class KCSSReader {
         }
       }
 
+      $this->skipSpaces();
+
       if($this->readChar() != '{') $this->exception("Jeton imprévu -> '".$this->readChar()."'");
       $this->nextChar();
 
@@ -711,6 +713,7 @@ class KCSSReader {
           $nomFinal .= $sep;
         }
       } else {
+        $this->skipSpaces();
         if($this->readChar() != '{') return null;
       }
 
@@ -775,28 +778,28 @@ class KCSSReader {
     $this->nextChar();
     $this->skipSpaces();
 
-    if($this->readChar() == '?'){
-      $this->nextChar();
-      $att->setVal($this->readVarVal());
 
-      while ($this->readChar() === ' ') $this->nextChar();
-      $c = $this->readChar();
-      if($c == ';' || $this->isNewLine($c) || $c == '}') $this->nextChar();
-      else $this->exception("Jeton imprévu -> '".$this->readChar()."'");
+    $valBuffer = "";
+    $c = $this->readChar();
+    $previousChar = $c;
 
-    } else {
-      $buffer = "";
-      $c = $this->readChar();
-      while ($c != ';' && !$this->isNewLine($c) && $c != '}') {
-        $buffer .= $c;
+    while ($c != ';' && !$this->isNewLine($c) && $c != '}') {
+      if($this->readChar() == '?'){
         $this->nextChar();
-        $c = $this->readChar();
+        $valBuffer .= $this->readVarVal();
+
+      } else {
+        if($c != ' ' || $previousChar != ' ') $valBuffer .= $c;
+        $this->nextChar();
       }
 
-      if ($c == ';') $this->nextChar();
-
-      $att->setVal($buffer);
+      $previousChar = $c;
+      $c = $this->readChar();
     }
+
+    if ($c == ';') $this->nextChar();
+
+    $att->setVal($valBuffer);
 
     return $att;
   }

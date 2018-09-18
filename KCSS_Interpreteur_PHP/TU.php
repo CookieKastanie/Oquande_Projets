@@ -41,6 +41,22 @@ body{
 "), "");
 $lesTests->addTest(array($kcss, "writeCSS"), array(), "body a,body p{color:red;position:relatif;}body:hover{background-color:pink;}@media only screen and (max-width: 600px){body{background-color:lightblue;}}");
 
+$lesTests->addTest(array($kcss, "readKCSS"), array("?val  : 500
+?type: px;
+
+span[salade]:hover
+{
+ width: ?val?type}
+
+
+
+@media
+
+{
+  body{color:wow?type   rrr}
+}"), "");
+$lesTests->addTest(array($kcss, "writeCSS"), array(), "span[salade]:hover{width:500px;}@media{body{color:wowpx rrr;}}");
+
 ////////////////////////////////////////////////////////////////////////////////
 
 $lesTests->start();
