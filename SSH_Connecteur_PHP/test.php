@@ -3,7 +3,7 @@
 require_once "SSH.php";
 
 $ssh = new SSH('letoutchaud.fr');
-$ssh->login('jeremy', '_jeje07205_');
+$ssh->login('///////', '////////////');
 
 var_dump($ssh->listing());
 var_dump($ssh->listing("WIPCE"));
