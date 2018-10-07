@@ -1,26 +1,18 @@
 <?php
 
 class KJSImports{
-  private $fileList;
+  private $pathList;
 
   function __construct(){
-    $this->fileList = array();
+    $this->pathList = array();
   }
 
   public function add($path){
-    array_push($this->fileList, new JSFile($path, 1000));
+    new JSFile($this->pathList, $path, 10000);
   }
 
   public function getList(){
-    $all = array();
-
-    foreach ($this->fileList as $file) {
-      foreach ($file->getImports() as $import) {
-        array_push($all, $import);
-      }
-    }
-
-    return array_reverse(array_unique($all, SORT_STRING));
+    return $this->pathList;
   }
 
   public function getText(){
@@ -35,35 +27,32 @@ class KJSImports{
 
 class JSFile{
   private $path;
-  private $name;
-  private $imports;
+  private $pathList;
 
-  function __construct($path, $rec){
-    if ($rec == 0) throw new Exception("Erreur: Boucle d'import JavaScript détecté");
+  function __construct(&$pathList, $path, $rec){
+    if ($rec == 0) throw new Exception("Erreur: Boucle d'import détecté");
+    $this->pathList = &$pathList;
 
     $infos = pathinfo($path);
 
     $this->path = $infos['dirname'];
-    $this->name = $infos['basename'];
+    $name = $infos['basename'];
 
-    $files = array();
+    $this->addToPathList($this->path."/".$name);
 
     $imports = $this->readImports($this->readFile($path));
     foreach ($imports as $import) {
-      array_push($files, new JSFile($import, $rec - 1));
+      new JSFile($this->pathList, $import, $rec - 1);
     }
-
-    $this->imports = $files;
   }
 
-  public function getImports(){
-    $list = array($this->path."/".$this->name);
-
-    foreach ($this->imports as $import) {
-      $list = array_merge(array_unique($list, SORT_STRING), $import->getImports());
+  private function addToPathList($p){
+    if(!in_array($p, $this->pathList)) {
+      array_unshift($this->pathList, $p);
+      return true;
     }
 
-    return array_unique($list, SORT_STRING);
+    return false;
   }
 
   //////////////////////////////////
@@ -83,7 +72,7 @@ class JSFile{
         if ($c != ">") {
           $pathBuffer .= $c;
         } else {
-          array_push($pathList, $this->path."/".$pathBuffer);
+          if($this->addToPathList($this->path."/".$pathBuffer)) array_push($pathList, $this->path."/".$pathBuffer);
           $find = false;
           $buffer = "";
         }
