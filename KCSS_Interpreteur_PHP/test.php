@@ -5,7 +5,7 @@ include_once "KCSSReader.php";
 $kcss = new KCSSReader();
 
 try {
-  $kcss->readKCSSFile("test.kcss"); // ou $kcss->readKCSS("KCSS brute");
+  $kcss->readKCSSFile(["testVars.kcss", "test.kcss"]); // ou $kcss->readKCSS("KCSS brute");
 } catch (Exception $e) {
   echo($e->getMessage()); // messages d'erreur d'interprétation du KCSS
 }

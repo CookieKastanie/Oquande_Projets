@@ -1,6 +1,6 @@
 <?php
 
-class KJSImports{
+class KImports{
   private $pathList;
 
   function __construct(){
@@ -8,24 +8,24 @@ class KJSImports{
   }
 
   public function add($path){
-    new JSFile($this->pathList, $path, 10000);
+    new ImportedFile($this->pathList, $path, 10000);
   }
 
   public function getList(){
     return $this->pathList;
   }
 
-  public function getText(){
+  /*public function getText(){
     $list = $this->getList();
     $str = "";
 
     foreach ($list as $p) $str .= "<script type=\"text/javascript\" src=\"".$p."\"></script>\n";
     return $str;
-  }
+  }*/
 }
 
 
-class JSFile{
+class ImportedFile{
   private $path;
   private $pathList;
 
@@ -42,7 +42,7 @@ class JSFile{
 
     $imports = $this->readImports($this->readFile($path));
     foreach ($imports as $import) {
-      new JSFile($this->pathList, $import, $rec - 1);
+      new ImportedFile($this->pathList, $import, $rec - 1);
     }
   }
 
