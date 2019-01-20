@@ -9,8 +9,14 @@ body{
   }
 }
 
+/*
 @media only screen and (max-width: ?width) {
   body {
     background-color: ?bg_color;
   }
+}
+*/
+@keyframes arteuyiok {
+ from{}
+
 }

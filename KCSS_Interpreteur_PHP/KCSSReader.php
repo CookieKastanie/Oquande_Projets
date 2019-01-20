@@ -147,6 +147,7 @@ class Sequence extends Node{
   private $root;
   private $nom;
   private $mediaChilds;
+  private $type;
 
   function __construct($root = false) {
     parent::__construct();
@@ -177,6 +178,14 @@ class Sequence extends Node{
 
   public function getNom(){
     return $this->nom;
+  }
+
+  public function setType($t){
+    $this->type = trim($t);
+  }
+
+  public function getType(){
+    return $this->type;
   }
 
   public function toCSS(){
@@ -353,7 +362,7 @@ class KCSSReader {
 
   public function readKCSS($text){
     $this->resetAll();
-    $this->readKCSSText($text);
+    $this->readKCSSText($text." ");
   }
 
   private function readKCSSText($text){
@@ -535,6 +544,7 @@ class KCSSReader {
           if($fisrtWord && ($c == ' ' || $c == '{')){
             $fisrtWord = false;
             if(!Words::mediaExist($nomFinal)) $this->exception("Le type de bloc '".$nomFinal."' n'existe pas");
+            $seq->setType($nomFinal);
           }
         }
       }
@@ -550,6 +560,10 @@ class KCSSReader {
 
     $this->skipSpaces();
 
+    if($seq->getType() == "@keyframes") {
+      $this->readKeyframes($seq);
+      return $seq;
+    }
 
     while ($this->notEOF() && !(!$root && $this->readChar() == '}')) {
 
@@ -775,6 +789,7 @@ class KCSSReader {
       }
 
       $this->skipSpaces();
+      if(!$this->notEOF()) $this->exception("EOF inattendu");
     }
 
     $this->nextChar();
@@ -835,6 +850,65 @@ class KCSSReader {
     return $att;
   }
 
+  private function readKeyframes(&$seq){
+
+    $this->skipSpaces();
+
+    while ($this->notEOF() && ($this->readChar() != '}')) {
+
+      $block = new Block();
+
+      $nomFinal = "";
+
+      do {
+        $nom = $this->readNom(true);
+
+        echo $nom;
+        if($nom == "from" || $nom == "to"){
+          $nomFinal .= $nom;
+        } else {
+          $this->exception("$nom wowoowowowowowowow");
+        }
+
+        $this->skipSpaces();
+        $this->nextChar();
+
+        if(!$this->notEOF()) $this->exception("EOF inattendu");
+      } while ($this->readChar() != "{");
+
+
+      $block->setNom($nomFinal);
+
+      $this->nextChar();
+
+      $this->skipSpaces();
+
+      while ($this->readChar() != '}') {
+
+        if(!$this->readVar()){
+          $node = $this->readAttribut();
+          if ($node) $block->addAttribute($node);
+          if (!$node) {
+            $this->skipSpaces();
+            if ($this->readChar() != '}') {
+             $this->exception("Fermeture du bloc '".$block->getNom()."' introuvable");
+            }
+          }
+        }
+
+        $this->skipSpaces();
+      }
+
+      $this->nextChar();
+
+      $seq->addChild($block);
+
+    }
+
+    $this->skipSpaces();
+
+    return $seq;
+  }
 }
 
 ?>
